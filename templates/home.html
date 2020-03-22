@@ -7,26 +7,34 @@
 {% block navbar %}
 <nav class="navbar">
     <div class="container row justify-content-start">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Salsa</a>
-        </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li><a href="#">Home</a></li>
-                <li><a href="#">Our Salsa</a></li>
+                <li><a href="#">Our Story</a></li>
+                <li><a href="#">Alsas</a></li>
             </ul>
         </div>
     </div>
 </nav>
 {% endblock %}
 
+{% block styles %}
+{{super()}}
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+{% endblock %}
+
 {% block content %}
 <body>
-    Welcome to the Salsa Site!
+    <div class="container top-layer motto">
+        <!-- Motto -->
+        <div id="side">
+            <p>Salsa</p>
+            <p>Ignited!</p>
+        </div>
+        <!-- Salsa pictures -->
+        <div id="side">
+            <img src="https://www.browneyedbaker.com/wp-content/uploads/2016/04/salsa-12-1200.jpg" alt="salsa">
+        </div>
+    </div>
 </body>
 {% endblock %}

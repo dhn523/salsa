@@ -5,5 +5,10 @@
 .motto{
     color: whitesmoke;
     text-align: left;
-    font-size: 35em;
+    font-size: 4em;
+}
+
+/* id to be used to place side by side */
+#side{
+    float: left;
 }
