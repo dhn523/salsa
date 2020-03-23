@@ -1,5 +1,17 @@
 .top-layer{
-    background-color: tomato;
+    background-color: #ED714B;
+}
+
+.salsa-layer{
+    background-color: #EFD469;
+}
+
+.story-layer{
+    background-color: #B2BD7E;
+}
+
+.signup-layer{
+    background-color: #94B9AF;
 }
 
 .motto{

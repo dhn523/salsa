@@ -10,8 +10,9 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li><a href="#">Home</a></li>
-                <li><a href="#">Our Story</a></li>
                 <li><a href="#">Alsas</a></li>
+                <li><a href="#">Our Story</a></li>
+                <li><a href="#">Sign up</a></li>
             </ul>
         </div>
     </div>
@@ -25,7 +26,7 @@
 
 {% block content %}
 <body>
-    <div class="container top-layer motto">
+    <div class="container-fluid top-layer motto">
         <!-- Motto -->
         <div id="side">
             <p>Salsa</p>
@@ -35,6 +36,25 @@
         <div id="side">
             <img src="https://www.browneyedbaker.com/wp-content/uploads/2016/04/salsa-12-1200.jpg" alt="salsa">
         </div>
+    </div>
+    <div class="container-fluid salsa-layer">
+        <!-- Alsas -->
+        <img src="https://ceceliasgoodstuff.com/wp-content/uploads/2017/07/Fire-Roasted-Jalapeno-Salsa.jpg" alt="salsa">
+    </div>
+    <div class="container-fluid story-layer">
+        <!-- Our story -->
+        <h2> The First Scoops </h2>
+        <p> Just like a great blend of ingredients that go into a good salsa, the ingredients that went into igniting our passion ranged widely and brought us to this point. </p>
+        <img src="{{url_for('static', filename='theBoys.JPG')}}" alt="boys" width="500em">
+    </div>
+    <div class="container-fluid signup-layer">
+        <!-- Sign up -->
+        <h3>Get in line to ignite your taste buds!</h3>
+        <form>
+            <label for="email">Email:</label><br>
+            <input type="text" id="email" name="email" value="example@email.com">
+            <input type="submit" value="Sign Up">
+          </form>
     </div>
 </body>
 {% endblock %}
