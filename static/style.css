@@ -1,3 +1,17 @@
+.flex{
+    display: flex;
+}
+
+.flex div{
+    flex: 1;
+    align-self: center;
+}
+
+.layer{
+    height: 50em;
+}
+
+
 .top-layer{
     background-color: #ED714B;
 }
@@ -16,11 +30,26 @@
 
 .motto{
     color: whitesmoke;
-    text-align: left;
+    text-align: center;    
     font-size: 4em;
 }
 
-/* id to be used to place side by side */
-#side{
-    float: left;
+/* Making a circle */
+.theboys{
+    border-radius: 50%;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#picture{
+    height: 25em;
+    /* float: left;
+    padding-right: 10em; */
+}
+
+.centernav{
+    align-self: center;
 }
