@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="120">
+    <title>Train Arrival</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #29335c 0%, #517664 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Animated background elements */
+        .bg-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        .bg-circle:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            background: #e4572e;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bg-circle:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            background: #f3a712;
+            top: 60%;
+            right: 20%;
+            animation-delay: -10s;
+        }
+
+        .bg-circle:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            background: #e4572e;
+            bottom: 20%;
+            left: 30%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        /* Main container */
+        .train-display {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 3rem 4rem;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 10;
+            max-width: 600px;
+            width: 90%;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            0% { 
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Train icon */
+        .train-icon {
+            font-size: 4rem;
+            color: #29335c;
+            margin-bottom: 2rem;
+            animation: trainMove 2s ease-in-out infinite;
+        }
+
+        @keyframes trainMove {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        /* Main text */
+        .arrival-text {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #29335c;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Minutes display */
+        .minutes-container {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .minutes-display {
+            font-size: 6rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #e4572e 0%, #f3a712 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(228, 87, 46, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .minutes-label {
+            font-size: 1.8rem;
+            color: #517664;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 2rem;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #e4572e, #f3a712, #517664);
+            border-radius: 10px;
+            width: 0%;
+            animation: progressFill 5s ease-in-out infinite;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0%; }
+            50% { width: 75%; }
+            100% { width: 0%; }
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #f3a712;
+            border-radius: 50%;
+            margin-left: 10px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Decorative elements */
+        .decoration {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #e4572e;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .decoration:nth-child(1) {
+            top: 20px;
+            right: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .decoration:nth-child(2) {
+            bottom: 20px;
+            left: 30px;
+            background: #f3a712;
+            animation: float 3s ease-in-out infinite reverse;
+        }
+
+        /* Next trains display */
+        .next-trains {
+            margin-top: 2rem;
+            padding: 1.5rem 2rem;
+            background: rgba(41, 51, 92, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(81, 118, 100, 0.3);
+        }
+
+        .next-train-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .train-label {
+            font-size: 1.2rem;
+            color: #29335c;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .train-times {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .train-time {
+            background: linear-gradient(135deg, #517664, #29335c);
+            color: white;
+            padding: 1.2rem 2rem;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .train-time:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .separator {
+            display: none; /* Hide separator since we're stacking */
+        }
+
+        /* Responsive design updates */
+        @media (max-width: 768px) {
+            .train-display {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .arrival-text {
+                font-size: 1.8rem;
+            }
+            
+            .minutes-display {
+                font-size: 4rem;
+            }
+            
+            .minutes-label {
+                font-size: 1.4rem;
+            }
+            
+            .next-trains {
+                padding: 1rem;
+                margin-top: 1.5rem;
+            }
+            
+            .train-times {
+                gap: 0.8rem;
+            }
+            
+            .train-time {
+                padding: 1rem 1.5rem;
+                font-size: 1.2rem;
+                max-width: 180px;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <div class="train-display">
+        <div class="decoration"></div>
+        <div class="decoration"></div>
+        
+        <div class="train-icon">
+            <i class="fas fa-train"></i>
+        </div>
+        
+        <h1 class="arrival-text">
+            The train arrives in:
+            <span class="status-indicator"></span>
+        </h1>
+        
+        <div class="minutes-container">
+            <div class="minutes-display" id="minutes-value">
+                {{ minutes if minutes is defined else 'N' }}
+            </div>
+            <div class="minutes-label">Minutes</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+        
+        <!-- Next trains display -->
+        <div class="next-trains">
+            <div class="next-train-item">
+                <span class="train-label">Next 2 trains in:</span>
+                <div class="train-times">
+                    <span class="train-time">{{ next_trains[1] if next_trains and next_trains|length > 1 else 'N/A' }} min</span>
+                    <span class="separator">&</span>
+                    <span class="train-time">{{ next_trains[2] if next_trains and next_trains|length > 2 else 'N/A' }} min</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const display = document.querySelector('.train-display');
+            
+            // Add mouse move effect
+            document.addEventListener('mousemove', function(e) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 20;
+                const y = (e.clientY / window.innerHeight - 0.5) * 20;
+                
+                display.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
+            });
+            
+            // Reset on mouse leave
+            document.addEventListener('mouseleave', function() {
+                display.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+            });
+            
+            // Auto-refresh every 2 minutes (120,000 milliseconds)
+            let countdown = 120;
+            
+            // Update countdown display
+            const countdownElement = document.getElementById('countdown');
+            const countdownInterval = setInterval(function() {
+                countdown--;
+                if (countdownElement) {
+                    countdownElement.textContent = countdown;
+                }
+                
+                if (countdown <= 0) {
+                    location.reload();
+                }
+            }, 1000);
+            
+            // Also refresh after exactly 2 minutes as backup
+            setTimeout(function() {
+                location.reload();
+            }, 120000);
+        });
+    </script>
+</body>
+</html>

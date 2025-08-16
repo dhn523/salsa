@@ -11,7 +11,6 @@
     height: 50em;
 }
 
-
 .top-layer{
     background-color: #ED714B;
 }
@@ -50,6 +49,75 @@ img {
     padding-right: 10em; */
 }
 
-.centernav{
-    align-self: center;
+/* NAVBAR STYLES - Updated for Bootstrap 3.3.7 */
+.custom-navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    padding: 1rem 0 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+/* Center the navbar items - Bootstrap 3 method */
+.navbar-center {
+    float: none !important;
+    text-align: center !important;
+}
+
+.navbar-center > li {
+    float: none !important;
+    display: inline-block !important;
+}
+
+/* Style the nav links */
+.custom-navbar .navbar-nav > li > a {
+    color: white !important;
+    font-weight: 500 !important;
+    padding: 15px 25px !important;
+    margin: 0 5px !important;
+    border-radius: 25px !important;
+    transition: all 0.3s ease !important;
+}
+
+.custom-navbar .navbar-nav > li > a:hover,
+.custom-navbar .navbar-nav > li > a:focus {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+}
+
+/* Mobile toggle button styling */
+.custom-navbar .navbar-toggle {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.custom-navbar .navbar-toggle .icon-bar {
+    background-color: white !important;
+}
+
+.custom-navbar .navbar-toggle:hover,
+.custom-navbar .navbar-toggle:focus {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Responsive behavior */
+@media (max-width: 767px) {
+    .navbar-center {
+        text-align: left !important;
+    }
+    
+    .navbar-center > li {
+        display: block !important;
+    }
+    
+    .custom-navbar .navbar-nav > li > a {
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+}
+
+/* Remove old conflicting centernav class */
+.centernav {
+    /* This class is no longer needed - keeping empty to avoid breaking existing HTML */
 }
