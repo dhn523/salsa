@@ -217,7 +217,63 @@
             animation: float 3s ease-in-out infinite reverse;
         }
 
-        /* Responsive design */
+        /* Next trains display */
+        .next-trains {
+            margin-top: 2rem;
+            padding: 1.5rem 2rem;
+            background: rgba(41, 51, 92, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(81, 118, 100, 0.3);
+        }
+
+        .next-train-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .train-label {
+            font-size: 1.2rem;
+            color: #29335c;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .train-times {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .train-time {
+            background: linear-gradient(135deg, #517664, #29335c);
+            color: white;
+            padding: 1.2rem 2rem;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .train-time:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .separator {
+            display: none; /* Hide separator since we're stacking */
+        }
+
+        /* Responsive design updates */
         @media (max-width: 768px) {
             .train-display {
                 padding: 2rem;
@@ -235,7 +291,23 @@
             .minutes-label {
                 font-size: 1.4rem;
             }
+            
+            .next-trains {
+                padding: 1rem;
+                margin-top: 1.5rem;
+            }
+            
+            .train-times {
+                gap: 0.8rem;
+            }
+            
+            .train-time {
+                padding: 1rem 1.5rem;
+                font-size: 1.2rem;
+                max-width: 180px;
+            }
         }
+        
     </style>
 </head>
 <body>
@@ -268,6 +340,18 @@
         <div class="progress-container">
             <div class="progress-bar"></div>
         </div>
+        
+        <!-- Next trains display -->
+        <div class="next-trains">
+            <div class="next-train-item">
+                <span class="train-label">Next 2 trains in:</span>
+                <div class="train-times">
+                    <span class="train-time">{{ next_trains[1] if next_trains and next_trains|length > 1 else 'N/A' }} min</span>
+                    <span class="separator">&</span>
+                    <span class="train-time">{{ next_trains[2] if next_trains and next_trains|length > 2 else 'N/A' }} min</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -287,6 +371,27 @@
             document.addEventListener('mouseleave', function() {
                 display.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
             });
+            
+            // Auto-refresh every 2 minutes (120,000 milliseconds)
+            let countdown = 120;
+            
+            // Update countdown display
+            const countdownElement = document.getElementById('countdown');
+            const countdownInterval = setInterval(function() {
+                countdown--;
+                if (countdownElement) {
+                    countdownElement.textContent = countdown;
+                }
+                
+                if (countdown <= 0) {
+                    location.reload();
+                }
+            }, 1000);
+            
+            // Also refresh after exactly 2 minutes as backup
+            setTimeout(function() {
+                location.reload();
+            }, 120000);
         });
     </script>
 </body>

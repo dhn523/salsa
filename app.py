@@ -1,51 +1,46 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 from flask_bootstrap import Bootstrap
 from MTAInfo import get_next_trains
 from requests import request
 from flask import request
+from models import db, GTFSStop  # Import your new model
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
 bootstrap = Bootstrap(app)
 
-@app.route('/')
-def home():
-    test = "F21N"
-    arrivals = get_next_trains(test, 3)  # Get 3 trains instead of just 1
-    
-    if arrivals and len(arrivals) > 0:
-        # First train for main display
-        next_train_minutes = arrivals[0][1]
-        
-        # Extract just the minutes for the next trains
-        next_trains = [arrival[1] for arrival in arrivals]
-        
-        # print(f"All arrivals: {arrivals}")
-        # print(f"Minutes array: {next_trains}")
-    else:
-        next_train_minutes = "N/A"
-        next_trains = []
-    
-    return render_template('frontPage.html', 
-                         minutes=next_train_minutes, 
-                         next_trains=next_trains)
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gtfs_data.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-@app.route('/test')
-def test():
-    # minutes = 5  # Your variable here
-    station_id = request.args.get('station')
-    if not station_id:
-        station_id = "F21N"
-    arrivals = get_next_trains(station_id)
-    print(arrivals)
-    if arrivals:
-        next_train_minutes = arrivals[0][1]  # Minutes for next train
-        if next_train_minutes == 0:
-            next_train_minutes = arrivals[1][1]  # Now
-    else:
-        next_train_minutes = "N/A"
-    print(f"Next train arrives in: {next_train_minutes} minutes")
-    return render_template('test.html', minutes=next_train_minutes)
+# Initialize database with app
+db.init_app(app)
+
+# Take this out for one time script
+# with app.app_context():
+#     db.create_all()
+#     print("Database tables created!")
+#     load_gtfs_data_from_csv('MTA_Subway_Stations.csv')
+
+@app.route('/')
+def pookie():
+    # return render_template('frontPage.html')
+    return render_template('frontPage_test.html')
+
+@app.route('/api/stops/search')
+def search_stops():
+    """Search stops by name"""
+    query = request.args.get('q', '')
+    if query:
+        stops = GTFSStop.query.filter(GTFSStop.stop_name.contains(query)).all()
+        return jsonify([stop.to_dict() for stop in stops])
+    return jsonify([])
+
+@app.route('/api/stops')
+def get_all_stops():
+    """Get all stops"""
+    stops = GTFSStop.query.all()
+    return jsonify([stop.to_dict() for stop in stops])
 
 
 @app.route('/routes')
@@ -80,9 +75,33 @@ def home_routes():
                          next_trains=next_trains,
                          next_routes=next_routes)
 
-@app.route('/pookie')
-def pookie():
-    return render_template('pookie.html')
+
+# @app.route('/')
+# def home():
+#     test = "F21N"
+#     arrivals = get_next_trains(test, 3)  # Get 3 trains instead of just 1
+    
+#     if arrivals and len(arrivals) > 0:
+#         # First train for main display
+#         next_train_minutes = arrivals[0][1]
+        
+#         # Extract just the minutes for the next trains
+#         next_trains = [arrival[1] for arrival in arrivals]
+        
+#         # print(f"All arrivals: {arrivals}")
+#         # print(f"Minutes array: {next_trains}")
+#     else:
+#         next_train_minutes = "N/A"
+#         next_trains = []
+    
+#     return render_template('frontPage_mvp.html', 
+#                          minutes=next_train_minutes, 
+#                          next_trains=next_trains)
+
+@app.route('/test')
+def test():
+    pass
+
 
 if __name__ == "__main__":
     app.run(debug=True)
