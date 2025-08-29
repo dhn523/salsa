@@ -1,6 +1,6 @@
 from app import app
 from models import db
-from your_csv_loader import load_gtfs_data_from_csv
+from data_loader import load_gtfs_data_from_csv
 
 def setup_database():
     with app.app_context():
