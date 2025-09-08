@@ -24,8 +24,12 @@ db.init_app(app)
 
 @app.route('/')
 def pookie():
-    # return render_template('frontPage.html')
-    return render_template('frontPage_test.html')
+    testing  = True
+    if testing:
+        return render_template('frontPage_test.html')
+    else:
+        return render_template('frontPage.html')
+
 
 @app.route('/api/stops/search')
 def search_stops():
