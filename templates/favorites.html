@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favorites - MTA Train Times</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const MTATrainTimes = () => {
+          // Your 5 favorite stops with actual stop IDs
+          const stops = [
+            { id: 'F21N', name: 'Carroll St', direction: 'Manhattan Bound', lines: ['F', 'G'] },
+            { id: 'R28N', name: 'Court St', direction: 'Manhattan Bound', lines: ['R', 'W'] },
+            { id: 'A40N', name: 'High St', direction: 'Manhattan Bound', lines: ['A', 'C'] },
+            { id: 'R27S', name: 'Whitehall St', direction: 'Brooklyn Bound', lines: ['R', 'W'] },
+            { id: 'M16S', name: 'Marcy Ave', direction: 'Manhattan Bound', lines: ['J', 'M', 'Z'] }
+          ];
+
+          const [selectedStop, setSelectedStop] = useState(0);
+          const [trainTimes, setTrainTimes] = useState({});
+          const [loading, setLoading] = useState(false);
+          const [error, setError] = useState(null);
+
+          // Fetch train times from Flask API
+          const fetchTrainTimes = async (stopId) => {
+            setLoading(true);
+            setError(null);
+            try {
+              const response = await fetch(`/api/favorites/train-times/${stopId}`);
+              
+              if (!response.ok) {
+                throw new Error('Failed to fetch train times');
+              }
+              
+              const data = await response.json();
+              
+              setTrainTimes(prev => ({
+                ...prev,
+                [stopId]: data
+              }));
+            } catch (err) {
+              console.error('Error fetching train times:', err);
+              setError('Unable to load train times');
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          // Fetch times for selected stop on mount and when selection changes
+          useEffect(() => {
+            const currentStopId = stops[selectedStop].id;
+            fetchTrainTimes(currentStopId);
+          }, [selectedStop]);
+
+          // Auto-refresh every 30 seconds
+          useEffect(() => {
+            const interval = setInterval(() => {
+              fetchTrainTimes(stops[selectedStop].id);
+            }, 30000);
+            return () => clearInterval(interval);
+          }, [selectedStop]);
+
+          const getLineColor = (line) => {
+            const colors = {
+              '1': 'bg-red-400',
+              '2': 'bg-red-400',
+              '3': 'bg-red-400',
+              '4': 'bg-green-500',
+              '5': 'bg-green-500',
+              '6': 'bg-green-500',
+              '7': 'bg-purple-400',
+              'A': 'bg-blue-400',
+              'C': 'bg-blue-400',
+              'E': 'bg-blue-400',
+              'B': 'bg-orange-400',
+              'D': 'bg-orange-400',
+              'F': 'bg-orange-400',
+              'M': 'bg-orange-400',
+              'G': 'bg-lime-500',
+              'L': 'bg-gray-400',
+              'N': 'bg-yellow-400',
+              'Q': 'bg-yellow-400',
+              'R': 'bg-yellow-400',
+              'W': 'bg-yellow-400',
+              'J': 'bg-amber-500',
+              'Z': 'bg-amber-500',
+              'S': 'bg-gray-500'
+            };
+            return colors[line] || 'bg-gray-500';
+          };
+
+          const currentStop = stops[selectedStop];
+          const times = trainTimes[currentStop.id] || [];
+
+          return (
+            <div className="min-h-screen bg-slate-50 text-gray-800 font-sans">
+              {/* Header */}
+              <div className="bg-blue-500 px-4 py-6 shadow-md">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-blue-500 font-bold text-2xl">M</span>
+                  </div>
+                  <h1 className="text-2xl font-bold text-white">My Favorites</h1>
+                </div>
+                
+                {/* Stop Selector Pills */}
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                  {stops.map((stop, index) => (
+                    <button
+                      key={stop.id}
+                      onClick={() => setSelectedStop(index)}
+                      className={`flex-shrink-0 px-4 py-2 rounded-full font-semibold transition-all ${
+                        selectedStop === index
+                          ? 'bg-white text-blue-600 shadow-md scale-105'
+                          : 'bg-blue-400 bg-opacity-50 text-white hover:bg-opacity-70'
+                      }`}
+                    >
+                      <span className="text-sm">{stop.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Main Content */}
+              <div className="px-4 py-8">
+                {/* Current Stop Display */}
+                <div className="bg-white rounded-2xl p-6 shadow-md mb-6 border border-gray-100">
+                  <div className="mb-4">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-1">{currentStop.name}</h2>
+                    <p className="text-gray-500 text-sm">{currentStop.direction}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {currentStop.lines.map((line) => (
+                      <div
+                        key={line}
+                        className={`w-10 h-10 rounded-full ${getLineColor(line)} flex items-center justify-center shadow-sm`}
+                      >
+                        <span className="text-white font-bold text-lg">{line}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                    <p className="text-red-600 text-center">{error}</p>
+                  </div>
+                )}
+
+                {/* Train Times */}
+                <div className="space-y-4">
+                  {loading && times.length === 0 ? (
+                    <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-gray-100">
+                      <div className="animate-pulse">
+                        <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+                        <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto"></div>
+                      </div>
+                    </div>
+                  ) : times.length > 0 ? (
+                    times.map((train, index) => (
+                      <div
+                        key={index}
+                        className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 transform transition-all hover:shadow-md"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-full ${getLineColor(train.route)} flex items-center justify-center shadow-sm`}>
+                              <span className="text-white font-bold text-xl">{train.route}</span>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 text-sm uppercase tracking-wide">Train {index + 1}</p>
+                              <p className="text-lg font-semibold text-gray-700">
+                                {train.minutes === 0 ? 'Arriving Now' : train.minutes === 1 ? 'Due' : `${train.minutes} min`}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-5xl font-bold text-blue-500">
+                              {train.minutes}
+                            </div>
+                            <p className="text-gray-500 text-sm mt-1">minutes</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-gray-100">
+                      <p className="text-gray-500 text-lg">No train times available</p>
+                      <p className="text-gray-400 text-sm mt-2">Try refreshing in a moment</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Refresh Button */}
+                <button
+                  onClick={() => fetchTrainTimes(currentStop.id)}
+                  disabled={loading}
+                  className="w-full mt-6 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-xl transition-all shadow-sm"
+                >
+                  {loading ? 'Refreshing...' : 'Refresh Times'}
+                </button>
+
+                {/* Last Updated */}
+                <p className="text-center text-gray-400 text-sm mt-4">
+                  Auto-refreshes every 30 seconds
+                </p>
+              </div>
+            </div>
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MTATrainTimes />);
+    </script>
+</body>
+</html>

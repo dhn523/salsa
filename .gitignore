@@ -7,3 +7,5 @@ __pycache__/
 .env
 venv/
 .vscode/
+static/search.js
+templates/typeahead_testing.html

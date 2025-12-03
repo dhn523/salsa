@@ -381,8 +381,106 @@
                 padding: 0.9rem 1rem;
             }
         }
+
+        .search-container {
+    position: relative;
+    width: 400px;
+    margin: 50px auto;
+    }
+
+#search-input {
+    width: 100%;
+    padding: 1.2rem 3rem 1.2rem 1.5rem;
+    font-size: 1.1rem;
+    border: 2px solid rgba(255, 181, 0, 0.6);
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    color: #0e2fa2;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    /* Search icon on the right */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffb500"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 1.5rem center;
+    background-size: 16px;
+}
+
+#search-input:focus {
+    outline: none;
+    border-color: #ffb500;
+    box-shadow: 0 0 20px rgba(255, 181, 0, 0.3);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+#search-input::placeholder {
+    color: rgba(14, 47, 162, 0.6);
+    font-weight: 500;
+}
+
+.dropdown-visible {
+    /* position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); */
+    position: absolute;
+    top: calc(100% - 8px);
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 181, 0, 0.6);
+    border-top: none;
+    border-radius: 0 0 30px 30px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(255, 181, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.dropdown-hidden {
+    display: none;
+}
+
+.result-item {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 181, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.result-item:hover {
+    background: rgba(255, 181, 0, 0.1);
+    backdrop-filter: blur(20px);
+}
+
+.result-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 28px 28px;
+}
+
+.result-name {
+    font-weight: 600;
+    color: #0e2fa2;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
     </style>
 </head>
+
+<script src="{{ url_for('static', filename='search.js') }}"></script>
+
 <body>
     <div class="bg-animation">
         <div class="floating-shape"></div>
@@ -400,6 +498,14 @@
         <h1 class="main-title">Where is pookie going?</h1>
         
         <div class="form-container">
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search subway stops..." autocomplete="off">
+                <input type="hidden" id="selected-stop-id" value="">
+                <div id="results-dropdown" class="dropdown-hidden">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+
             <div class="dropdown-container">
                 <select id="stopSelect" class="dropdown">
                     <option value="">🚇 Select a subway stop...</option>
@@ -407,7 +513,7 @@
             </div>
             
             <div class="dropdown-container">
-                <select id="directionSelect" class="dropdown" disabled>
+                <select id="directionSelect" class="dropdown">
                     <option value="">🧭 Choose direction...</option>
                 </select>
             </div>
@@ -426,13 +532,118 @@
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         let allStops = [];
         let selectedStop = null;
+        const boroughNames = {
+            'M': 'Manhattan',
+            'Q': 'Queens', 
+            'Bx': 'Bronx',
+            'Bk': 'Brooklyn',
+            'SI': 'Staten Island'
+        };
 
         // Load all stops when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadStops();
+
+    const searchInput = document.getElementById('search-input');
+    const selectedStopInput = document.getElementById('selected-stop-id');
+    const resultsDropdown = document.getElementById('results-dropdown');
+    let searchTimeout;
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        console.log('Searching for:', query);
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        if (query.length < 3) {
+            hideResults();
+            return;
+        }
+        
+        // Debounce search requests
+        searchTimeout = setTimeout(() => {
+            performSearch(query);
+        }, 300);
+    });
+
+    function performSearch(query) {
+        fetch(`/api/stops/search?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                searchInput.classList.remove('search-loading');
+                displayResults(data);
+            })
+            .catch(error => {
+                searchInput.classList.remove('search-loading');
+                console.error('Search error:', error);
+                hideResults();
+            });
+    }
+
+    function displayResults(results) {
+        if (results.length === 0) {
+            hideResults();
+            return;
+        }
+
+        let html = '';
+        results.forEach(item => {
+            console.log('Result item:', item);
+            html += `
+                <div class="result-item" id="selected-stop-id" data-id="${item.id}">
+                    <div class="result-name">${item.stop_name}</div>
+                </div>
+            `;
+        });
+        
+        resultsDropdown.innerHTML = html;
+        resultsDropdown.className = 'dropdown-visible';
+        
+        // Add click handlers to results
+        addResultClickHandlers();
+    }
+
+    function addResultClickHandlers() {
+    //     const resultItems = document.querySelectorAll('.result-item');
+    //     resultItems.forEach(item => {
+    //         item.addEventListener('click', function() {
+    //             const name = this.querySelector('.result-name').textContent;
+    //             searchInput.value = name;
+    //             hideResults();
+    //         });
+    //     });
+    // }
+        const resultItems = document.querySelectorAll('.result-item');
+        resultItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const name = this.querySelector('.result-name').textContent;
+                const stopId = this.dataset.id;
+                console.log('Selected stop1:', name, 'ID:', stopId);
+                searchInput.value = name;
+                selectedStopInput.value = stopId;
+                hideResults();
+                
+                // Optional: Trigger custom event to notify other parts of your app
+                searchInput.dispatchEvent(new CustomEvent('stopSelected', { 
+                    detail: { id: stopId, name: name } 
+                }));
+            });
+        });
+    }
+
+    function hideResults() {
+        resultsDropdown.className = 'dropdown-hidden';
+    }
+
+    // Hide results when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.search-container')) {
+            hideResults();
+        }
+    });
         });
 
         async function loadStops() {
@@ -457,7 +668,8 @@
                 allStops.forEach(stop => {
                     const option = document.createElement('option');
                     option.value = stop.gtfs_stop_id;
-                    option.textContent = `${stop.stop_name} (${stop.borough || 'N/A'})`;
+                    const borough = boroughNames[stop.borough] || 'N/A';
+                    option.textContent = `${stop.stop_name} (${borough})`;
                     option.dataset.stopData = JSON.stringify(stop);
                     stopSelect.appendChild(option);
                 });
@@ -470,9 +682,18 @@
             }
         }
 
+
+        // Handle searched selection
+        document.getElementById('selected-stop-id').addEventListener('change', function() {
+            const selectedValue = this.value;
+            console.log('Searched stop name:', selectedValue);
+
+        });
+
         // Handle stop selection
         document.getElementById('stopSelect').addEventListener('change', function() {
             const selectedValue = this.value;
+            console.log('Selected stop ID:', selectedValue);
             const directionSelect = document.getElementById('directionSelect');
             const goButton = document.getElementById('goButton');
             
@@ -557,6 +778,8 @@
                 stopSelect.appendChild(option);
             });
         }
-    </script>
+        
+
+    </script> -->
 </body>
 </html>
