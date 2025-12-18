@@ -38,6 +38,10 @@ def typeahead():
 def favorites():
     return render_template('favorites.html')
 
+@app.route('/favorite')
+def favorite():
+    return render_template('favorites_ad.html')
+
 @app.route('/api/favorites/train-times/<stop_id>')
 def get_favorite_train_times(stop_id):
     """Get train times for a favorite stop"""
