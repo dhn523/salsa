@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festive Cocktails</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        @keyframes bounce-in {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-bounce-in {
+            animation: bounce-in 0.5s ease-out;
+        }
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .animate-flash {
+            animation: flash 0.8s ease-in-out 3;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(139, 69, 19, 0.2);
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 215, 170, 0.4);
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 215, 170, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        {% raw %}
+        const { useState, useEffect } = React;
+
+        const drinks = [
+          {
+            id: 1,
+            name: "Gingerbread Old Fashioned",
+            image: "/static/Drink_OldFashioned.png",
+            ingredients: [
+              "2 oz Bourbon",
+              "1/4 oz Gingerbread Syrup",
+              "2-3 dashes Orange Bitters",
+              "Garnish: Orange twist, Cinnamon stick",
+              "",
+              "Gingerbread Syrup:",
+              "1 cup Water",
+              "1 cup Brown Sugar",
+              "2-3 inches Fresh Ginger",
+              "2 Cinnamon sticks",
+              "4-5 Cloves",
+              "1/4 tsp Ground Nutmeg",
+              "2 tbsp Molasses",
+              "3-4 Black Peppercorns"
+            ]
+          },
+          {
+            id: 2,
+            name: "Gingerbread Manhattan",
+            image: "/static/Drink_Manhattan.png",
+            ingredients: [
+              "2 oz Bourbon",
+              "1 oz Sweet Vermouth",
+              "1/2 oz Gingerbread Syrup"
+            ]
+          },
+          {
+            id: 3,
+            name: "Mulled Wine",
+            image: "/static/Drink_Mulled_Wine.png",
+            ingredients: [
+              "1 bottle Red Wine",
+              "1/4 cup Sugar",
+              "1 Orange, sliced",
+              "2 Cinnamon sticks",
+              "4-5 Whole Cloves",
+              "Cardamom pods (optional)"
+            ]
+          },
+          {
+            id: 4,
+            name: "Pomegranate Rosemary Spritz",
+            image: "/static/Drink_Pom_Spritz.png",
+            ingredients: [
+              "2 cups Pomegranate Juice",
+              "1 cup Gin or Vodka",
+              "1/2 cup Lemon Juice",
+              "1/2 cup Rosemary Simple Syrup",
+              "",
+              "Rosemary Simple Syrup:",
+              "1 cup Water",
+              "1 cup Sugar",
+              "3-4 sprigs Rosemary"
+            ]
+          },
+          {
+            id: 5,
+            name: "Coquito",
+            image: "/static/Drink_Coquito.png",
+            ingredients: [
+              "15 oz Cream of Coconut (Coco López)",
+              "14 oz Sweetened Condensed Milk",
+              "13 oz Full Fat Coconut Milk",
+              "12 oz Evaporated Milk",
+              "1 cup White Rum (Don Q Cristal)",
+              "1 tsp Vanilla Extract",
+              "1 tsp Ground Cinnamon",
+              "1/2 tsp Ground Nutmeg",
+              "Toasted Coconut"
+            ]
+          }
+        ];
+
+        const DrinkCard = ({ drink }) => {
+          const [isFlipped, setIsFlipped] = useState(false);
+
+          return (
+            <div 
+              className="relative h-[420px] cursor-pointer group"
+              style={{ perspective: '1000px' }}
+              onClick={() => setIsFlipped(!isFlipped)}
+            >
+              <div 
+                className="relative w-full h-full transition-transform duration-700 ease-in-out"
+                style={{
+                  transformStyle: 'preserve-3d',
+                  transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
+                }}
+              >
+                {/* Front of card */}
+                <div 
+                  className="absolute w-full h-full rounded-2xl overflow-hidden shadow-xl"
+                  style={{
+                    backfaceVisibility: 'hidden',
+                    background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.15) 0%, rgba(101, 67, 33, 0.15) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    border: '2px solid rgba(255, 215, 170, 0.3)'
+                  }}
+                >
+                  <div className="relative h-56 overflow-hidden bg-gradient-to-br from-amber-900/40 to-orange-900/40">
+                    <img 
+                      src={drink.image} 
+                      alt={drink.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  </div>
+                  
+                  <div className="p-6 relative">
+                    <h3 className="text-2xl font-bold text-center mb-3 text-amber-100" 
+                        style={{ 
+                          fontFamily: 'Georgia, serif',
+                          textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+                        }}>
+                      {drink.name}
+                    </h3>
+                    
+                    <div className="flex items-center justify-center gap-2 text-amber-200/80 text-sm">
+                      <span>✨</span>
+                      <span>Tap to view recipe</span>
+                      <span>✨</span>
+                    </div>
+                  </div>
+
+                  {/* Decorative elements */}
+                  <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-amber-300/40 rounded-tl-lg"></div>
+                  <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-amber-300/40 rounded-tr-lg"></div>
+                  <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-amber-300/40 rounded-bl-lg"></div>
+                  <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-amber-300/40 rounded-br-lg"></div>
+
+                  {/* Hover glow effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
+                       style={{
+                         background: 'radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%)'
+                       }}>
+                  </div>
+                </div>
+
+                {/* Back of card */}
+                <div 
+                  className="absolute w-full h-full rounded-2xl overflow-hidden shadow-xl p-6"
+                  style={{
+                    backfaceVisibility: 'hidden',
+                    transform: 'rotateY(180deg)',
+                    background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(101, 67, 33, 0.2) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    border: '2px solid rgba(255, 215, 170, 0.3)'
+                  }}
+                >
+                  <div className="h-full flex flex-col">
+                    <h3 className="text-xl font-bold text-center mb-4 text-amber-100 pb-3 border-b-2 border-amber-400/30"
+                        style={{ fontFamily: 'Georgia, serif' }}>
+                      Ingredients
+                    </h3>
+                    
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                      <ul className="space-y-2">
+                        {drink.ingredients.map((ingredient, idx) => (
+                          ingredient === "" ? (
+                            <li key={idx} className="h-3"></li>
+                          ) : (
+                            <li key={idx} 
+                                className="text-amber-50 text-sm flex items-start"
+                                style={{ 
+                                  textShadow: '1px 1px 2px rgba(0,0,0,0.4)',
+                                  fontWeight: ingredient.endsWith(':') ? '600' : '400'
+                                }}>
+                              {!ingredient.endsWith(':') && (
+                                <span className="text-amber-300 mr-2 flex-shrink-0">•</span>
+                              )}
+                              <span className={ingredient.endsWith(':') ? 'text-amber-200' : ''}>
+                                {ingredient}
+                              </span>
+                            </li>
+                          )
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-amber-400/30 text-center">
+                      <p className="text-amber-200/60 text-xs">Tap to flip back</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const FestiveDrinksMenu = () => {
+          const [showPopup, setShowPopup] = useState(false);
+
+          useEffect(() => {
+            const timer = setTimeout(() => {
+              setShowPopup(true);
+            }, 15000);
+            return () => clearTimeout(timer);
+          }, []);
+
+          return (
+            <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
+                 style={{
+                   background: 'linear-gradient(180deg, #2d1810 0%, #4a2511 50%, #2d1810 100%)'
+                 }}>
+              {showPopup && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+                  <div className="bg-gradient-to-br from-red-900 to-green-900 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-bounce-in border-4 border-yellow-400">
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowPopup(false)}
+                        className="absolute top-4 right-4 w-10 h-10 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg transition-all z-10"
+                      >
+                        ×
+                      </button>
+                      <div className="p-6">
+                        <h3 className="text-3xl font-bold text-yellow-300 mb-6 text-center animate-flash"
+                            style={{ 
+                              fontFamily: 'Georgia, serif',
+                              textShadow: '3px 3px 6px rgba(0,0,0,0.8)'
+                            }}>
+                          🎄 Merry Christmas 🎄<br/>
+                          You Filthy Animal! 🎅
+                        </h3>
+                        <div className="bg-white rounded-xl p-2 mb-4 shadow-xl">
+                          <img
+                            src="/static/theBoys.JPG"
+                            alt="The Boys"
+                            className="w-full h-auto rounded-lg shadow-md animate-flash"
+                            onError={(e) => {
+                              e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect fill="%23ddd" width="400" height="400"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-size="24">Photo Not Found</text></svg>';
+                            }}
+                          />
+                        </div>
+                        <p className="text-center text-amber-100 mb-6 text-lg font-semibold">
+                          Enjoy these festive cocktails! 🍹✨
+                        </p>
+                        <button
+                          onClick={() => setShowPopup(false)}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg text-lg"
+                        >
+                          Let's Get Festive! 🎉
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="text-center mb-12 relative">
+                  <div className="inline-block relative">
+                    <h1 className="text-5xl md:text-6xl font-bold text-amber-100 mb-4"
+                        style={{ 
+                          fontFamily: 'Georgia, serif',
+                          textShadow: '3px 3px 6px rgba(0,0,0,0.5)'
+                        }}>
+                      Festive Cocktails
+                    </h1>
+                    <div className="absolute -top-6 -right-6 text-yellow-300 text-3xl animate-pulse">
+                      ✨
+                    </div>
+                    <div className="absolute -bottom-4 -left-6 text-yellow-300 text-2xl animate-pulse" style={{ animationDelay: '0.5s' }}>
+                      ✨
+                    </div>
+                  </div>
+                  <p className="text-amber-200/80 text-lg mt-4 max-w-2xl mx-auto">
+                    Warm your spirits with our curated collection of holiday beverages
+                  </p>
+                  <div className="flex items-center justify-center gap-8 mt-6">
+                    <div className="h-px w-24 bg-gradient-to-r from-transparent to-amber-400/50"></div>
+                    <span className="text-amber-300 text-xl">✨</span>
+                    <div className="h-px w-24 bg-gradient-to-l from-transparent to-amber-400/50"></div>
+                  </div>
+                </div>
+
+                {/* Drinks Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 lg:gap-8">
+                  {drinks.map((drink) => (
+                    <DrinkCard key={drink.id} drink={drink} />
+                  ))}
+                </div>
+
+                {/* Footer */}
+                <div className="text-center mt-16 text-amber-200/60 text-sm">
+                  <p>✨ Cheers to the holiday season! ✨</p>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FestiveDrinksMenu />);
+        {% endraw %}
+    </script>
+</body>
+</html>

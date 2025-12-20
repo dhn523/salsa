@@ -42,6 +42,14 @@ def favorites():
 def favorite():
     return render_template('favorites_ad.html')
 
+@app.route('/holiday')
+def holiday():
+    return render_template('holiday.html')
+
+@app.route('/mainholiday')
+def mainholiday():
+    return render_template('holiday_ads.html')
+
 @app.route('/api/favorites/train-times/<stop_id>')
 def get_favorite_train_times(stop_id):
     """Get train times for a favorite stop"""
