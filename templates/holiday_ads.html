@@ -146,7 +146,7 @@
               >
                 {/* Front of card */}
                 <div 
-                  className="absolute w-full h-full rounded-2xl overflow-hidden shadow-xl"
+                  className="absolute w-full h-full rounded-2xl overflow-hidden shadow-xl flex flex-col"
                   style={{
                     backfaceVisibility: 'hidden',
                     background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.15) 0%, rgba(101, 67, 33, 0.15) 100%)',
@@ -154,36 +154,29 @@
                     border: '2px solid rgba(255, 215, 170, 0.3)'
                   }}
                 >
-                  <div className="relative h-56 overflow-hidden bg-gradient-to-br from-amber-900/40 to-orange-900/40">
+                  {/* Image at top */}
+                  <div className="relative h-64 overflow-hidden bg-gradient-to-br from-amber-900/40 to-orange-900/40">
                     <img 
                       src={drink.image} 
                       alt={drink.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  </div>
-                  
-                  <div className="p-6 relative">
-                    <h3 className="text-2xl font-bold text-center mb-3 text-amber-100" 
-                        style={{ 
-                          fontFamily: 'Georgia, serif',
-                          textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
-                        }}>
-                      {drink.name}
-                    </h3>
-                    
-                    <div className="flex items-center justify-center gap-2 text-amber-200/80 text-sm">
-                      <span>✨</span>
-                      <span>Tap to view recipe</span>
-                      <span>✨</span>
-                    </div>
                   </div>
 
-                  {/* Decorative elements */}
-                  <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-amber-300/40 rounded-tl-lg"></div>
-                  <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-amber-300/40 rounded-tr-lg"></div>
-                  <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-amber-300/40 rounded-bl-lg"></div>
-                  <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-amber-300/40 rounded-br-lg"></div>
+                  {/* Text at bottom */}
+                  <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-t from-amber-900/30 to-transparent">
+                    <div className="flex flex-col items-center justify-center gap-2 text-center">
+                      <div className="flex items-center justify-center gap-3 text-amber-100 text-lg font-bold"
+                           style={{ 
+                             textShadow: '3px 3px 8px rgba(0,0,0,0.9), 0 0 20px rgba(255, 215, 0, 0.3)',
+                             filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.5))'
+                           }}>
+                        <span className="text-xl">✨</span>
+                        <span>Tap to View Recipe</span>
+                        <span className="text-xl">✨</span>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Hover glow effect */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
